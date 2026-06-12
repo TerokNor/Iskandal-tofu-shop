@@ -9,11 +9,12 @@ const DB = {
   setSession(uid)   { localStorage.setItem(this._key('session'), uid); },
   clearSession()    { localStorage.removeItem(this._key('session')); },
 
-  addScore(userId, money, days, won) {
+  addScore(userId, money, computerMoney, days, won) {
     const scores = this.getScores();
     scores.push({
       userId,
       money,
+      computerMoney,
       days,
       won,
       date: new Date().toLocaleDateString('ja-JP'),

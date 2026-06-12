@@ -77,7 +77,7 @@ const App = {
             ユーザー: <span style="color:var(--accent)">${this._esc(user.id)}</span>
           </p>
           <button class="btn btn-primary" onclick="App._startGame()">ゲームスタート</button>
-          <button class="btn btn-secondary mt-8" onclick="location.hash='#/highscores'">ハイスコア一覧</button>
+          <button class="btn btn-secondary mt-8" onclick="location.hash='#/highscores'">スコア一覧</button>
           <button class="btn btn-secondary mt-8" onclick="location.hash='#/account'">アカウント設定</button>
           <button class="btn btn-secondary mt-8" onclick="Auth.logout();App._renderTop()">ログアウト</button>
         </div>
@@ -352,12 +352,22 @@ const App = {
         <div class="tofu-row">
           <div class="form-group">
             <input class="form-input" id="inp-tofu" type="number"
-              inputmode="numeric" min="0" max="${max}" placeholder="0">
+              inputmode="numeric" min="0" max="${max}" value="0">
           </div>
           <button class="btn-make" id="btn-make">作る</button>
         </div>
+        <input type="range" class="tofu-slider" id="tofu-slider" min="0" max="${max}" value="0">
+        <div class="adj-btns">
+          <button class="adj-btn" data-delta="-100">−100</button>
+          <button class="adj-btn" data-delta="-10">−10</button>
+          <button class="adj-btn" data-delta="-1">−1</button>
+          <button class="adj-btn" data-delta="1">＋1</button>
+          <button class="adj-btn" data-delta="10">＋10</button>
+          <button class="adj-btn" data-delta="100">＋100</button>
+        </div>
         <p class="hint">仕入れ ${TOFU_COST}円/個 → 販売 ${TOFU_PRICE}円/個</p>
-      </div>`;
+      </div>
+      <button class="btn btn-giveup ani" id="btn-giveup">ギブアップ</button>`;
   },
 
   _gameReveal(g) {
@@ -377,7 +387,8 @@ const App = {
           <span class="prod-value computer">${g.computerTofu}個</span>
         </div>
       </div>
-      <button class="btn btn-primary ani" id="btn-reveal">次の日へ →</button>`;
+      <button class="btn btn-primary ani" id="btn-reveal">次の日へ →</button>
+      <button class="btn btn-giveup ani" id="btn-giveup">ギブアップ</button>`;
   },
 
   _gameResult(g) {
@@ -442,21 +453,49 @@ const App = {
         </div>
       </div>
       <button class="btn btn-primary  ani" id="btn-again">もう一度プレイ</button>
-      <button class="btn btn-secondary ani mt-8" id="btn-scores">ハイスコアを見る</button>`;
+      <button class="btn btn-secondary ani mt-8" id="btn-scores">スコアを見る</button>`;
   },
 
   _bindGame(g) {
     const $ = id => document.getElementById(id);
 
+    // ギブアップ（input / reveal フェーズ共通）
+    const giveupBtn = $('btn-giveup');
+    if (giveupBtn) {
+      giveupBtn.onclick = () => {
+        if (!confirm('本当にギブアップしますか？')) return;
+        const user = Auth.currentUser();
+        g.giveUp();
+        if (user) DB.addScore(user.id, g.playerMoney, g.computerMoney, g.day, false);
+        this._renderGame();
+      };
+    }
+
     if (g.phase === 'input') {
-      const input = $('inp-tofu');
-      const btn   = $('btn-make');
+      const input  = $('inp-tofu');
+      const slider = $('tofu-slider');
+      const btn    = $('btn-make');
       if (!input || !btn) return;
+
+      const max = g.playerMax();
+
+      const clamp = v => Math.min(Math.max(0, Math.floor(v)), max);
+      const sync  = v => { input.value = v; slider.value = v; };
+
+      // スライダー ↔ 数値入力 の同期
+      slider.addEventListener('input', () => sync(clamp(Number(slider.value))));
+      input.addEventListener('input',  () => sync(clamp(Number(input.value))));
+
+      // 増減ボタン
+      document.querySelectorAll('.adj-btn').forEach(b => {
+        b.onclick = () => sync(clamp((clamp(Number(input.value))) + Number(b.dataset.delta)));
+      });
+
       input.focus();
+
       const submit = () => {
-        const v = parseInt(input.value) || 0;
         btn.disabled = true;
-        g.submitPlayerTofu(v);
+        g.submitPlayerTofu(clamp(Number(input.value)));
         this._renderGame();
       };
       btn.onclick = submit;
@@ -479,7 +518,7 @@ const App = {
         g.nextTurn();
         if (g.phase === 'gameover') {
           const user = Auth.currentUser();
-          if (user) DB.addScore(user.id, g.playerMoney, g.day, g.winner === 'player');
+          if (user) DB.addScore(user.id, g.playerMoney, g.computerMoney, g.day, g.winner === 'player');
         }
         this._renderGame();
       };
@@ -493,24 +532,28 @@ const App = {
   },
 
   /* ═══════════════════════════════════
-     ハイスコア一覧
+     スコア一覧
   ═══════════════════════════════════ */
   _renderHighScores() {
     const scores = DB.getScores();
     let rows = '';
 
     if (scores.length === 0) {
-      rows = `<tr><td colspan="5" class="score-none">まだスコアがありません</td></tr>`;
+      rows = `<tr><td colspan="7" class="score-none">まだスコアがありません</td></tr>`;
     } else {
-      scores.slice(0, 30).forEach((s, i) => {
-        const rc = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+      scores.forEach((s, i) => {
+        const rc   = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
+        const comp = s.computerMoney != null ? s.computerMoney.toLocaleString() + '円' : '—';
+        const days = s.days != null ? s.days + '日' : '—';
         rows += `
           <tr>
             <td class="rank ${rc}">${i + 1}</td>
-            <td>${this._esc(s.userId)}</td>
-            <td style="text-align:right">${s.money.toLocaleString()}円</td>
+            <td class="sc-player">${this._esc(s.userId)}</td>
+            <td class="sc-num">${s.money.toLocaleString()}円</td>
+            <td class="sc-num sc-dim">${comp}</td>
+            <td class="sc-num sc-dim">${days}</td>
             <td class="${s.won ? 'score-win' : 'score-lose'}">${s.won ? '勝' : '敗'}</td>
-            <td style="color:var(--text-dim);font-size:.73rem">${s.date}</td>
+            <td class="sc-date">${s.date}</td>
           </tr>`;
       });
     }
@@ -518,22 +561,26 @@ const App = {
     this._html(`
       <div class="screen">
         <div class="page-header">
-          <div class="page-title" style="font-size:1.5rem">HIGHSCORES</div>
-          <div class="page-subtitle">最高スコア一覧（上位30件）</div>
+          <div class="page-title" style="font-size:1.5rem">SCORES</div>
+          <div class="page-subtitle">スコア一覧（${scores.length}件）</div>
         </div>
-        <div class="card ani">
-          <table class="score-table">
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>プレイヤー</th>
-                <th style="text-align:right">スコア</th>
-                <th>結果</th>
-                <th>日付</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
+        <div class="card ani" style="padding:12px 8px">
+          <div class="score-scroll">
+            <table class="score-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>プレイヤー</th>
+                  <th class="sc-num">あなた</th>
+                  <th class="sc-num">相手</th>
+                  <th class="sc-num">DAY</th>
+                  <th>結果</th>
+                  <th class="sc-date">日付</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
         </div>
       </div>
       ${this._nav('highscores')}

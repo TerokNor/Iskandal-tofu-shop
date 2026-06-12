@@ -105,6 +105,11 @@ class GameState {
     this.phase = 'result';
   }
 
+  giveUp() {
+    this.phase  = 'gameover';
+    this.winner = 'computer';
+  }
+
   nextTurn() {
     if (this.isGameOver()) {
       this.phase  = 'gameover';

@@ -408,3 +408,62 @@ hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
 
 /* Hint text */
 .hint { font-size: 0.75rem; color: var(--text-dim); margin-top: 8px; }
+
+/* ── Tofu Slider ────────────────── */
+.tofu-slider {
+  width: 100%;
+  margin: 10px 0 6px;
+  accent-color: var(--accent);
+  height: 24px;
+  cursor: pointer;
+}
+
+.adj-btns {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 4px;
+}
+.adj-btn {
+  flex: 1;
+  padding: 8px 2px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: .78rem;
+  cursor: pointer;
+  text-align: center;
+  transition: background .1s;
+}
+.adj-btn:active { background: var(--border); }
+
+/* ── Give Up button ─────────────── */
+.btn-giveup {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 9px;
+  background: transparent;
+  border: 1px dashed var(--red);
+  border-radius: var(--radius);
+  color: var(--red);
+  font-family: var(--font);
+  font-size: .82rem;
+  cursor: pointer;
+  text-align: center;
+  opacity: .7;
+  transition: opacity .15s;
+}
+.btn-giveup:hover { opacity: 1; }
+
+/* ── Score table ────────────────── */
+.score-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.score-table { white-space: nowrap; }
+.sc-num  { text-align: right !important; }
+.sc-dim  { color: var(--text-dim); }
+.sc-player { max-width: 90px; overflow: hidden; text-overflow: ellipsis; }
+.sc-date { color: var(--text-dim); font-size: .72rem; }
