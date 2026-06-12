@@ -349,14 +349,16 @@ const App = {
       </div>
       <div class="card ani">
         <div class="card-title">トーフを何個作りますか？（最大 ${max}個）</div>
-        <div class="tofu-row">
-          <div class="form-group">
-            <input class="form-input" id="inp-tofu" type="number"
-              inputmode="numeric" min="0" max="${max}" value="0">
-          </div>
-          <button class="btn-make" id="btn-make">作る</button>
+
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px">
+          <input class="form-input" id="inp-tofu" type="number"
+            inputmode="numeric" min="0" max="${max}" value="0"
+            style="flex:1;font-size:1.4rem;text-align:center">
+          <button class="btn-max" id="btn-max">MAX<br><span style="font-size:.7rem">${max}個</span></button>
         </div>
+
         <input type="range" class="tofu-slider" id="tofu-slider" min="0" max="${max}" value="0">
+
         <div class="adj-btns">
           <button class="adj-btn" data-delta="-100">−100</button>
           <button class="adj-btn" data-delta="-10">−10</button>
@@ -365,6 +367,8 @@ const App = {
           <button class="adj-btn" data-delta="10">＋10</button>
           <button class="adj-btn" data-delta="100">＋100</button>
         </div>
+
+        <button class="btn btn-primary" id="btn-make" style="margin-top:14px">作る</button>
         <p class="hint">仕入れ ${TOFU_COST}円/個 → 販売 ${TOFU_PRICE}円/個</p>
       </div>
       <button class="btn btn-giveup ani" id="btn-giveup">ギブアップ</button>`;
@@ -486,8 +490,12 @@ const App = {
       slider.addEventListener('input', () => sync(clamp(Number(slider.value))));
       input.addEventListener('input',  () => sync(clamp(Number(input.value))));
 
+      // MAX ボタン
+      const maxBtn = $('btn-max');
+      if (maxBtn) maxBtn.onclick = () => sync(max);
+
       // 増減ボタン
-      document.querySelectorAll('.adj-btn').forEach(b => {
+      document.querySelectorAll('.adj-btn[data-delta]').forEach(b => {
         b.onclick = () => sync(clamp((clamp(Number(input.value))) + Number(b.dataset.delta)));
       });
 
