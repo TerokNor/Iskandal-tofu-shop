@@ -1,3 +1,4 @@
+// Copyright (C) 1978-2026 by N.Tsuda
 /* ── App (SPA ルーター + ビュー) ──────── */
 const App = {
   game: null,
@@ -70,6 +71,7 @@ const App = {
         <div class="page-header">
           <div class="page-title">ISKANDAL</div>
           <div class="page-subtitle">イスカンダルのトーフ屋ゲーム</div>
+          <div class="page-copyright">Copyright (C) 1978-2026 by N.Tsuda</div>
         </div>
         <div class="card ani">
           <div class="card-title">ようこそ</div>
@@ -146,6 +148,7 @@ const App = {
         <div class="page-header">
           <div class="page-title">ISKANDAL</div>
           <div class="page-subtitle">イスカンダルのトーフ屋ゲーム</div>
+          <div class="page-copyright">Copyright (C) 1978-2026 by N.Tsuda</div>
         </div>
         ${err ? `<div class="msg msg-error">${err}</div>` : ''}
         <div class="card ani">

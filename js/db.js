@@ -1,3 +1,4 @@
+// Copyright (C) 1978-2026 by N.Tsuda
 const DB = {
   _key: k => 'iskandal_' + k,
 

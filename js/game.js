@@ -1,3 +1,4 @@
+// Copyright (C) 1978-2026 by N.Tsuda
 /* ── 定数 ───────────────────────────── */
 const TOFU_COST  = 40;
 const TOFU_PRICE = 50;

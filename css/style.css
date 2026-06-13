@@ -96,6 +96,12 @@ body::before {
   margin-top: 6px;
   letter-spacing: 0.05em;
 }
+.page-copyright {
+  color: var(--gray);
+  font-size: 0.65rem;
+  margin-top: 6px;
+  letter-spacing: 0.03em;
+}
 
 /* Cards */
 .card {
