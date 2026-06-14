@@ -1,5 +1,5 @@
 // Copyright (C) 1978-2026 by N.Tsuda
-const CACHE_NAME = 'iskandal-v10';
+const CACHE_NAME = 'iskandal-v12';
 const ASSETS = [
   '/',
   '/index.html',

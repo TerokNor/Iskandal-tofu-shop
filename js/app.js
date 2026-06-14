@@ -72,6 +72,7 @@ const App = {
           <div class="page-title">ISKANDAL</div>
           <div class="page-subtitle">イスカンダルのトーフ屋ゲーム</div>
           <div class="page-copyright">Copyright (C) 1978-2026 by N.Tsuda</div>
+          <div class="page-copyright">Ported with &quot;Claude Code (Sonnet 4.6)&quot;</div>
         </div>
         <div class="card ani">
           <div class="card-title">ようこそ</div>
@@ -149,6 +150,7 @@ const App = {
           <div class="page-title">ISKANDAL</div>
           <div class="page-subtitle">イスカンダルのトーフ屋ゲーム</div>
           <div class="page-copyright">Copyright (C) 1978-2026 by N.Tsuda</div>
+          <div class="page-copyright">Ported with &quot;Claude Code (Sonnet 4.6)&quot;</div>
         </div>
         ${err ? `<div class="msg msg-error">${err}</div>` : ''}
         <div class="card ani">
