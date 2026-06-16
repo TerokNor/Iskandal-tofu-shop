@@ -80,7 +80,7 @@ const App = {
           <div class="page-copyright">Ported with &quot;Claude Code (Sonnet 4.6)&quot;</div>
         </div>
         <div class="card ani" style="text-align:center;padding:20px 16px">
-          <img src="/icons/icon-192.png" style="width:108px;border-radius:16px;margin-bottom:12px">
+          <img src="/icons/icon-192.png" style="width:80%;max-width:220px;border-radius:16px;margin-bottom:12px">
           <div class="catchphrase">トーフを売って、地球に還ろう</div>
           <p style="color:var(--text-dim);font-size:.85rem;margin:12px 0 16px">
             ユーザー: <span style="color:var(--accent)">${this._esc(user.id)}</span>
