@@ -462,6 +462,32 @@ hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
 }
 .btn-max:active { background: rgba(79,195,247,.15); }
 
+/* ── Catchphrase ────────────────── */
+.catchphrase {
+  font-size: 1rem;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+  margin: 8px 0 4px;
+}
+
+/* ── Zero button ────────────────── */
+.btn-zero {
+  flex-shrink: 0;
+  padding: 0 14px;
+  height: 48px;
+  background: transparent;
+  border: 1px solid var(--text-dim);
+  border-radius: var(--radius);
+  color: var(--text-dim);
+  font-family: var(--font);
+  font-size: 1.3rem;
+  font-weight: bold;
+  cursor: pointer;
+  text-align: center;
+  transition: background .15s;
+}
+.btn-zero:active { background: rgba(120,120,160,.15); }
+
 /* ── Give Up button ─────────────── */
 .btn-giveup {
   display: block;

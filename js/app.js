@@ -15,7 +15,7 @@ const App = {
     const hash = location.hash || '#/';
     const user = Auth.currentUser();
 
-    if (!user && hash !== '#/' && hash !== '#/register') {
+    if (!user && hash !== '#/' && hash !== '#/register' && hash !== '#/rules') {
       location.hash = '#/';
       return;
     }
@@ -24,6 +24,7 @@ const App = {
     else if (hash.startsWith('#/account'))    this._renderAccount();
     else if (hash.startsWith('#/game'))       this._renderGame();
     else if (hash.startsWith('#/highscores')) this._renderHighScores();
+    else if (hash.startsWith('#/rules'))      this._renderRules();
     else                                       this._renderTop();
   },
 
@@ -41,6 +42,9 @@ const App = {
         <div class="nav-item ${active==='game'       ?'active':''}" onclick="App._go('game')">
           <span class="nav-icon">🎮</span>ゲーム
         </div>
+        <div class="nav-item ${active==='rules'      ?'active':''}" onclick="App._go('rules')">
+          <span class="nav-icon">📖</span>ルール
+        </div>
         <div class="nav-item ${active==='highscores' ?'active':''}" onclick="App._go('highscores')">
           <span class="nav-icon">🏆</span>スコア
         </div>
@@ -55,6 +59,7 @@ const App = {
       if (!this.game || this.game.phase === 'gameover') this.game = new GameState();
       location.hash = '#/game';
     } else if (dest === 'home')       { location.hash = '#/'; }
+    else if (dest === 'rules')        { location.hash = '#/rules'; }
     else if (dest === 'highscores')   { location.hash = '#/highscores'; }
     else if (dest === 'account')      { location.hash = '#/account'; }
   },
@@ -74,63 +79,14 @@ const App = {
           <div class="page-copyright">Copyright (C) 1978-2026 by N.Tsuda</div>
           <div class="page-copyright">Ported with &quot;Claude Code (Sonnet 4.6)&quot;</div>
         </div>
-        <div class="card ani">
-          <div class="card-title">ようこそ</div>
-          <p style="color:var(--text-dim);font-size:.85rem;margin-bottom:14px">
+        <div class="card ani" style="text-align:center;padding:20px 16px">
+          <img src="/icons/icon-192.png" style="width:108px;border-radius:16px;margin-bottom:12px">
+          <div class="catchphrase">トーフを売って、地球に還ろう</div>
+          <p style="color:var(--text-dim);font-size:.85rem;margin:12px 0 16px">
             ユーザー: <span style="color:var(--accent)">${this._esc(user.id)}</span>
           </p>
           <button class="btn btn-primary" onclick="App._startGame()">ゲームスタート</button>
-          <button class="btn btn-secondary mt-8" onclick="location.hash='#/highscores'">スコア一覧</button>
-          <button class="btn btn-secondary mt-8" onclick="location.hash='#/account'">アカウント設定</button>
-          <button class="btn btn-secondary mt-8" onclick="Auth.logout();App._renderTop()">ログアウト</button>
-        </div>
-        <div class="card ani" style="font-size:.82rem;line-height:1.75">
-          <div class="card-title">ゲームルール</div>
-          <p style="color:var(--text-dim)">
-            イスカンダル星でトーフ屋を経営して、地球への帰還費用を稼ごう！<br>
-            コンピュータも向かいでトーフ屋を経営中。先に目標金額を超えた方が勝ち！
-          </p>
-          <table style="width:100%;margin-top:12px;border-collapse:collapse;font-size:.78rem">
-            <tr style="color:var(--text-dim);border-bottom:1px solid var(--border)">
-              <th style="text-align:left;padding:4px 0;font-weight:normal">項目</th>
-              <th style="text-align:right;padding:4px 8px;font-weight:normal">金額</th>
-            </tr>
-            <tr><td style="padding:5px 0;color:var(--text-dim)">開始所持金</td><td style="text-align:right;padding:5px 8px;color:var(--gold)">5,000円</td></tr>
-            <tr><td style="padding:5px 0;color:var(--text-dim)">勝利目標</td><td style="text-align:right;padding:5px 8px;color:var(--accent)">30,000円</td></tr>
-            <tr><td style="padding:5px 0;color:var(--text-dim)">仕入れ原価</td><td style="text-align:right;padding:5px 8px">40円/個</td></tr>
-            <tr><td style="padding:5px 0;color:var(--text-dim)">販売価格</td><td style="text-align:right;padding:5px 8px">50円/個</td></tr>
-          </table>
-          <div style="margin-top:14px;color:var(--text-dim);font-size:.78rem;margin-bottom:6px">天候別・最大販売数（需要）</div>
-          <div style="display:flex;flex-direction:column;gap:6px">
-            <div class="rule-weather-row" style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:1.1rem">☀️</span>
-              <span style="color:var(--text-dim);min-width:52px">晴れ</span>
-              <div class="w-bar-bg" style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden">
-                <div style="height:100%;width:100%;background:#ffd700;border-radius:4px"></div>
-              </div>
-              <span style="min-width:56px;text-align:right;color:var(--gold);font-weight:bold">最大500個</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:1.1rem">⛅</span>
-              <span style="color:var(--text-dim);min-width:52px">くもり</span>
-              <div class="w-bar-bg" style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden">
-                <div style="height:100%;width:60%;background:#90a4ae;border-radius:4px"></div>
-              </div>
-              <span style="min-width:56px;text-align:right;color:#90a4ae;font-weight:bold">最大300個</span>
-            </div>
-            <div style="display:flex;align-items:center;gap:8px">
-              <span style="font-size:1.1rem">🌧️</span>
-              <span style="color:var(--text-dim);min-width:52px">雨</span>
-              <div class="w-bar-bg" style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden">
-                <div style="height:100%;width:20%;background:#42a5f5;border-radius:4px"></div>
-              </div>
-              <span style="min-width:56px;text-align:right;color:#42a5f5;font-weight:bold">最大100個</span>
-            </div>
-          </div>
-          <p style="margin-top:10px;color:var(--text-dim)">
-            ※ 売れ残ったトーフは廃棄。翌日に持ち越せません。<br>
-            ※ 天気予報は確率表示。実際の天気は翌日に判明します。
-          </p>
+          <button class="btn btn-secondary mt-8" onclick="App._go('rules')">遊び方</button>
         </div>
       </div>
       ${this._nav('home')}
@@ -269,10 +225,20 @@ const App = {
           </div>
           <button class="btn btn-danger" id="btn-del">アカウントを削除する</button>
         </div>
+        <div class="card ani">
+          <div class="card-title">ログアウト</div>
+          <button class="btn btn-secondary" id="btn-logout">ログアウトする</button>
+        </div>
         <button class="btn btn-secondary" onclick="location.hash='#/'" style="margin-top:4px">← 戻る</button>
       </div>
       ${this._nav('account')}
     `);
+
+    document.getElementById('btn-logout').onclick = () => {
+      Auth.logout();
+      location.hash = '#/';
+      this._renderTop();
+    };
 
     document.getElementById('btn-del').onclick = async () => {
       if (!confirm('本当にアカウントを削除しますか？この操作は取り消せません。')) return;
@@ -356,6 +322,7 @@ const App = {
         <div class="card-title">トーフを何個作りますか？（最大 ${max}個）</div>
 
         <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px">
+          <button class="btn-zero" id="btn-zero">C</button>
           <input class="form-input" id="inp-tofu" type="number"
             inputmode="numeric" min="0" max="${max}" value="0"
             style="flex:1;font-size:1.4rem;text-align:center">
@@ -495,7 +462,9 @@ const App = {
       slider.addEventListener('input', () => sync(clamp(Number(slider.value))));
       input.addEventListener('input',  () => sync(clamp(Number(input.value))));
 
-      // MAX ボタン
+      // ０ボタン・MAXボタン
+      const zeroBtn = $('btn-zero');
+      if (zeroBtn) zeroBtn.onclick = () => sync(0);
       const maxBtn = $('btn-max');
       if (maxBtn) maxBtn.onclick = () => sync(max);
 
@@ -507,8 +476,10 @@ const App = {
       input.focus();
 
       const submit = () => {
+        const val = clamp(Number(input.value));
+        if (val === 0 && !confirm('今日は１個も作らずに休業しますか？')) return;
         btn.disabled = true;
-        g.submitPlayerTofu(clamp(Number(input.value)));
+        g.submitPlayerTofu(val);
         this._renderGame();
       };
       btn.onclick = submit;
@@ -542,6 +513,68 @@ const App = {
       if (btnAgain)  btnAgain.onclick  = () => { this.game = new GameState(); this._renderGame(); };
       if (btnScores) btnScores.onclick = () => { location.hash = '#/highscores'; };
     }
+  },
+
+  /* ═══════════════════════════════════
+     ルール（遊び方）
+  ═══════════════════════════════════ */
+  _renderRules() {
+    this._html(`
+      <div class="screen">
+        <div class="page-header">
+          <div class="page-title" style="font-size:1.6rem">遊び方</div>
+        </div>
+        <div class="card ani" style="font-size:.82rem;line-height:1.75">
+          <div class="card-title">ゲームルール</div>
+          <p style="color:var(--text-dim)">
+            イスカンダル星でトーフ屋を経営して、地球への帰還費用を稼ごう！<br>
+            コンピュータも向かいでトーフ屋を経営中。先に目標金額を超えた方が勝ち！
+          </p>
+          <table style="width:100%;margin-top:12px;border-collapse:collapse;font-size:.78rem">
+            <tr style="color:var(--text-dim);border-bottom:1px solid var(--border)">
+              <th style="text-align:left;padding:4px 0;font-weight:normal">項目</th>
+              <th style="text-align:right;padding:4px 8px;font-weight:normal">金額</th>
+            </tr>
+            <tr><td style="padding:5px 0;color:var(--text-dim)">開始所持金</td><td style="text-align:right;padding:5px 8px;color:var(--gold)">5,000円</td></tr>
+            <tr><td style="padding:5px 0;color:var(--text-dim)">勝利目標</td><td style="text-align:right;padding:5px 8px;color:var(--accent)">30,000円</td></tr>
+            <tr><td style="padding:5px 0;color:var(--text-dim)">仕入れ原価</td><td style="text-align:right;padding:5px 8px">40円/個</td></tr>
+            <tr><td style="padding:5px 0;color:var(--text-dim)">販売価格</td><td style="text-align:right;padding:5px 8px">50円/個</td></tr>
+          </table>
+          <div style="margin-top:14px;color:var(--text-dim);font-size:.78rem;margin-bottom:6px">天候別・最大販売数（需要）</div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:1.1rem">☀️</span>
+              <span style="color:var(--text-dim);min-width:52px">晴れ</span>
+              <div class="w-bar-bg" style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+                <div style="height:100%;width:100%;background:#ffd700;border-radius:4px"></div>
+              </div>
+              <span style="min-width:56px;text-align:right;color:var(--gold);font-weight:bold">最大500個</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:1.1rem">⛅</span>
+              <span style="color:var(--text-dim);min-width:52px">くもり</span>
+              <div class="w-bar-bg" style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+                <div style="height:100%;width:60%;background:#90a4ae;border-radius:4px"></div>
+              </div>
+              <span style="min-width:56px;text-align:right;color:#90a4ae;font-weight:bold">最大300個</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:1.1rem">🌧️</span>
+              <span style="color:var(--text-dim);min-width:52px">雨</span>
+              <div class="w-bar-bg" style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden">
+                <div style="height:100%;width:20%;background:#42a5f5;border-radius:4px"></div>
+              </div>
+              <span style="min-width:56px;text-align:right;color:#42a5f5;font-weight:bold">最大100個</span>
+            </div>
+          </div>
+          <p style="margin-top:10px;color:var(--text-dim)">
+            ※ 売れ残ったトーフは廃棄。翌日に持ち越せません。<br>
+            ※ 天気予報は確率表示。実際の天気は翌日に判明します。
+          </p>
+        </div>
+      </div>
+      ${this._nav('rules')}
+    `);
   },
 
   /* ═══════════════════════════════════
