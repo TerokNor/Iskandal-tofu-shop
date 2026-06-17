@@ -5,3 +5,6 @@
 - JavaScript のフレームワークは使用しない
 - ~/lab/PWA/pj1 ディレクトリで作業を行う
 - 作成したコードは git で管理する
+- sw.js の ASSETS に含まれるファイル（index.html / css / js / icons など）を変更したら、必ず sw.js の CACHE_NAME をインクリメントする（リロード反映のため）
+- 画像生成には ImageMagick (convert コマンド) を使用する。PIL/Pillow は未インストールだが、必要なら都度インストール可
+- アイコンは generate-icons.py で SVG を作成し PNG に変換して生成する

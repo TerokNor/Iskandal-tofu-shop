@@ -1,0 +1,19 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 generate-hero.py)",
+      "Bash(python3 generate-hero.py --plain)",
+      "Bash(grep -n * /home/gee/lab/PWA/pj1/generate-hero.py*)",
+      "Bash(grep -n * /home/gee/lab/PWA/pj1/generate-hero.py | head *)",
+      "Bash(fc-list :lang=ja*)",
+      "Bash(convert -list font*)",
+      "Bash(convert -size 80x80 xc:white -font * -pointsize * -fill * -gravity center -annotate 0 * /tmp/test_kanji2.png && convert /tmp/test_kanji2.png -colorspace gray txt: | grep -v * | wc -l)",
+      "Bash(convert /tmp/test_kanji.png -colorspace gray -threshold 90% txt: | grep -v * | head *)",
+      "Bash(convert /tmp/test_kanji.png -colorspace gray -threshold 90% -negate txt: | grep -v * | head *)",
+      "Bash(convert /tmp/test_kanji.png -format * info:)",
+      "Bash(convert /tmp/test_kanji.svg /tmp/test_kanji.png)",
+      "Bash(convert images/hero.png -format * info:)",
+      "Bash(convert images/hero.png -colorspace gray*)"
+    ]
+  }
+}
