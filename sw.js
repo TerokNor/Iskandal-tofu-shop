@@ -1,16 +1,16 @@
 // Copyright (C) 1978-2026 by N.Tsuda
-const CACHE_NAME = 'iskandal-v24';
+const CACHE_NAME = 'iskandal-v25';
 const ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/css/style.css',
-  '/js/db.js',
-  '/js/auth.js',
-  '/js/game.js',
-  '/js/app.js',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
+  './',
+  './index.html',
+  './manifest.json',
+  './css/style.css',
+  './js/db.js',
+  './js/auth.js',
+  './js/game.js',
+  './js/app.js',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
 ];
 
 self.addEventListener('install', event => {

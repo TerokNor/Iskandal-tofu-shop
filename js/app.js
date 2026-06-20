@@ -5,7 +5,7 @@ const App = {
 
   init() {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(() => {});
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
     window.addEventListener('hashchange', () => this.route());
     this.route();
@@ -81,7 +81,7 @@ const App = {
         </div>
         <div class="card ani" style="text-align:center;padding:20px 16px">
           <div style="position:relative;display:inline-block;width:100%;max-width:360px;margin-bottom:12px">
-            <img src="/images/hero.png" style="width:100%;border-radius:16px;display:block">
+            <img src="images/hero.png" style="width:100%;border-radius:16px;display:block">
             <div style="position:absolute;bottom:0;left:0;right:0;padding:8px 8px 14px;border-radius:0 0 16px 16px;background:linear-gradient(transparent,rgba(8,3,18,0.72));text-align:center;font-style:italic;font-size:0.82rem;letter-spacing:0.06em;color:#f0c840;text-shadow:0 1px 6px rgba(0,0,0,0.9)">
               Sell your TOFU, Reach your EARTH
             </div>
