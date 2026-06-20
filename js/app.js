@@ -13,19 +13,10 @@ const App = {
 
   route() {
     const hash = location.hash || '#/';
-    const user = Auth.currentUser();
-
-    if (!user && hash !== '#/' && hash !== '#/register' && hash !== '#/rules') {
-      location.hash = '#/';
-      return;
-    }
-
-    if      (hash.startsWith('#/register'))   this._renderRegister();
-    else if (hash.startsWith('#/account'))    this._renderAccount();
-    else if (hash.startsWith('#/game'))       this._renderGame();
-    else if (hash.startsWith('#/highscores')) this._renderHighScores();
-    else if (hash.startsWith('#/rules'))      this._renderRules();
-    else                                       this._renderTop();
+    if      (hash.startsWith('#/game'))   this._renderGame();
+    else if (hash.startsWith('#/scores')) this._renderScores();
+    else if (hash.startsWith('#/rules'))  this._renderRules();
+    else                                  this._renderTop();
   },
 
   _html(html) {
@@ -36,20 +27,17 @@ const App = {
   _nav(active) {
     return `
       <nav class="nav-bar">
-        <div class="nav-item ${active==='home'       ?'active':''}" onclick="App._go('home')">
+        <div class="nav-item ${active==='home'   ?'active':''}" onclick="App._go('home')">
           <span class="nav-icon">🏠</span>ホーム
         </div>
-        <div class="nav-item ${active==='game'       ?'active':''}" onclick="App._go('game')">
+        <div class="nav-item ${active==='game'   ?'active':''}" onclick="App._go('game')">
           <span class="nav-icon">🎮</span>ゲーム
         </div>
-        <div class="nav-item ${active==='rules'      ?'active':''}" onclick="App._go('rules')">
-          <span class="nav-icon">📖</span>ルール
+        <div class="nav-item ${active==='rules'  ?'active':''}" onclick="App._go('rules')">
+          <span class="nav-icon">📖</span>遊び方
         </div>
-        <div class="nav-item ${active==='highscores' ?'active':''}" onclick="App._go('highscores')">
-          <span class="nav-icon">🏆</span>スコア
-        </div>
-        <div class="nav-item ${active==='account'    ?'active':''}" onclick="App._go('account')">
-          <span class="nav-icon">👤</span>アカウント
+        <div class="nav-item ${active==='scores' ?'active':''}" onclick="App._go('scores')">
+          <span class="nav-icon">📊</span>成績
         </div>
       </nav>`;
   },
@@ -58,19 +46,15 @@ const App = {
     if (dest === 'game') {
       if (!this.game || this.game.phase === 'gameover') this.game = new GameState();
       location.hash = '#/game';
-    } else if (dest === 'home')       { location.hash = '#/'; }
-    else if (dest === 'rules')        { location.hash = '#/rules'; }
-    else if (dest === 'highscores')   { location.hash = '#/highscores'; }
-    else if (dest === 'account')      { location.hash = '#/account'; }
+    } else if (dest === 'home')   { location.hash = '#/'; }
+    else if (dest === 'rules')    { location.hash = '#/rules'; }
+    else if (dest === 'scores')   { location.hash = '#/scores'; }
   },
 
   /* ═══════════════════════════════════
      トップページ
   ═══════════════════════════════════ */
   _renderTop() {
-    const user = Auth.currentUser();
-    if (!user) { this._renderLogin(); return; }
-
     this._html(`
       <div class="screen">
         <div class="page-header">
@@ -87,9 +71,6 @@ const App = {
             </div>
           </div>
           <div class="catchphrase">トーフを売って、地球に還ろう</div>
-          <p style="color:var(--text-dim);font-size:.85rem;margin:12px 0 16px">
-            ユーザー: <span style="color:var(--accent)">${this._esc(user.id)}</span>
-          </p>
           <button class="btn btn-primary" onclick="App._startGame()">ゲームスタート</button>
           <button class="btn btn-secondary mt-8" onclick="App._go('rules')">遊び方</button>
         </div>
@@ -101,162 +82,6 @@ const App = {
   _startGame() {
     this.game = new GameState();
     location.hash = '#/game';
-  },
-
-  /* ── ログインフォーム ─────────── */
-  _renderLogin(err = '') {
-    this._html(`
-      <div class="screen">
-        <div class="page-header">
-          <div class="page-title">ISKANDAL</div>
-          <div class="page-subtitle">イスカンダルのトーフ屋ゲーム</div>
-          <div class="page-copyright">Copyright (C) 1978-2026 by N.Tsuda</div>
-          <div class="page-copyright">Ported with &quot;Claude Code (Sonnet 4.6)&quot;</div>
-        </div>
-        ${err ? `<div class="msg msg-error">${err}</div>` : ''}
-        <div class="card ani">
-          <div class="card-title">ログイン</div>
-          <div class="form-group">
-            <label class="form-label">ユーザーID</label>
-            <input class="form-input" id="uid" type="text" autocomplete="username" placeholder="ユーザーID">
-          </div>
-          <div class="form-group">
-            <label class="form-label">パスワード</label>
-            <input class="form-input" id="pass" type="password" autocomplete="current-password" placeholder="パスワード">
-          </div>
-          <button class="btn btn-primary" id="btn-login">ログイン</button>
-        </div>
-        <div class="text-center mt-8">
-          <a class="link" onclick="location.hash='#/register'">アカウント登録はこちら →</a>
-        </div>
-      </div>
-    `);
-
-    const doLogin = async () => {
-      const btn = document.getElementById('btn-login');
-      btn.disabled = true;
-      try {
-        await Auth.login(
-          document.getElementById('uid').value.trim(),
-          document.getElementById('pass').value
-        );
-        this._renderTop();
-      } catch (e) {
-        this._renderLogin(e.message);
-      }
-    };
-
-    document.getElementById('btn-login').onclick = doLogin;
-    document.getElementById('pass').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
-  },
-
-  /* ═══════════════════════════════════
-     アカウント登録画面
-  ═══════════════════════════════════ */
-  _renderRegister(err = '') {
-    this._html(`
-      <div class="screen">
-        <div class="page-header">
-          <div class="page-title" style="font-size:1.6rem">アカウント登録</div>
-        </div>
-        ${err ? `<div class="msg msg-error">${err}</div>` : ''}
-        <div class="card ani">
-          <div class="card-title">新規アカウント登録</div>
-          <div class="form-group">
-            <label class="form-label">ユーザーID（3文字以上）</label>
-            <input class="form-input" id="uid"   type="text"     autocomplete="username"     placeholder="ユーザーID">
-          </div>
-          <div class="form-group">
-            <label class="form-label">メールアドレス</label>
-            <input class="form-input" id="email" type="email"    autocomplete="email"        placeholder="example@mail.com">
-          </div>
-          <div class="form-group">
-            <label class="form-label">パスワード（4文字以上）</label>
-            <input class="form-input" id="pass"  type="password" autocomplete="new-password" placeholder="パスワード">
-          </div>
-          <button class="btn btn-primary" id="btn-reg">登録する</button>
-        </div>
-        <div class="text-center mt-8">
-          <a class="link" onclick="location.hash='#/'">ログインはこちら →</a>
-        </div>
-      </div>
-    `);
-
-    document.getElementById('btn-reg').onclick = async () => {
-      const btn = document.getElementById('btn-reg');
-      btn.disabled = true;
-      try {
-        await Auth.register(
-          document.getElementById('uid').value.trim(),
-          document.getElementById('email').value.trim(),
-          document.getElementById('pass').value
-        );
-        location.hash = '#/';
-        this._renderTop();
-      } catch (e) {
-        this._renderRegister(e.message);
-      }
-    };
-  },
-
-  /* ═══════════════════════════════════
-     アカウント設定画面
-  ═══════════════════════════════════ */
-  _renderAccount(err = '', ok = '') {
-    const user = Auth.currentUser();
-    if (!user) { location.hash = '#/'; return; }
-
-    this._html(`
-      <div class="screen">
-        <div class="page-header">
-          <div class="page-title" style="font-size:1.5rem">アカウント設定</div>
-        </div>
-        ${err ? `<div class="msg msg-error">${err}</div>` : ''}
-        ${ok  ? `<div class="msg msg-success">${ok}</div>` : ''}
-        <div class="card ani">
-          <div class="card-title">アカウント情報</div>
-          <p style="font-size:.85rem;color:var(--text-dim)">
-            ユーザーID: <span style="color:var(--text)">${this._esc(user.id)}</span>
-          </p>
-          <p style="font-size:.85rem;color:var(--text-dim);margin-top:6px">
-            メールアドレス: <span style="color:var(--text)">${this._esc(user.email)}</span>
-          </p>
-        </div>
-        <div class="card ani">
-          <div class="card-title">アカウント削除</div>
-          <p class="hint" style="margin-bottom:10px">削除するには現在のパスワードを入力してください。</p>
-          <div class="form-group">
-            <input class="form-input" id="del-pass" type="password" placeholder="現在のパスワード">
-          </div>
-          <button class="btn btn-danger" id="btn-del">アカウントを削除する</button>
-        </div>
-        <div class="card ani">
-          <div class="card-title">ログアウト</div>
-          <button class="btn btn-secondary" id="btn-logout">ログアウトする</button>
-        </div>
-        <button class="btn btn-secondary" onclick="location.hash='#/'" style="margin-top:4px">← 戻る</button>
-      </div>
-      ${this._nav('account')}
-    `);
-
-    document.getElementById('btn-logout').onclick = () => {
-      Auth.logout();
-      location.hash = '#/';
-      this._renderTop();
-    };
-
-    document.getElementById('btn-del').onclick = async () => {
-      if (!confirm('本当にアカウントを削除しますか？この操作は取り消せません。')) return;
-      const btn = document.getElementById('btn-del');
-      btn.disabled = true;
-      try {
-        await Auth.deleteAccount(user.id, document.getElementById('del-pass').value);
-        location.hash = '#/';
-        this._renderTop();
-      } catch (e) {
-        this._renderAccount(e.message);
-      }
-    };
   },
 
   /* ═══════════════════════════════════
@@ -434,20 +259,18 @@ const App = {
         </div>
       </div>
       <button class="btn btn-primary  ani" id="btn-again">もう一度プレイ</button>
-      <button class="btn btn-secondary ani mt-8" id="btn-scores">スコアを見る</button>`;
+      <button class="btn btn-secondary ani mt-8" id="btn-scores">成績を見る</button>`;
   },
 
   _bindGame(g) {
     const $ = id => document.getElementById(id);
 
-    // ギブアップ（input / reveal フェーズ共通）
     const giveupBtn = $('btn-giveup');
     if (giveupBtn) {
       giveupBtn.onclick = () => {
         if (!confirm('本当にギブアップしますか？')) return;
-        const user = Auth.currentUser();
         g.giveUp();
-        if (user) DB.addScore(user.id, g.playerMoney, g.computerMoney, g.day, false);
+        DB.addScore(g.playerMoney, g.computerMoney, g.day, false);
         this._renderGame();
       };
     }
@@ -463,17 +286,14 @@ const App = {
       const clamp = v => Math.min(Math.max(0, Math.floor(v)), max);
       const sync  = v => { input.value = v; slider.value = v; };
 
-      // スライダー ↔ 数値入力 の同期
       slider.addEventListener('input', () => sync(clamp(Number(slider.value))));
       input.addEventListener('input',  () => sync(clamp(Number(input.value))));
 
-      // ０ボタン・MAXボタン
       const zeroBtn = $('btn-zero');
       if (zeroBtn) zeroBtn.onclick = () => sync(0);
       const maxBtn = $('btn-max');
       if (maxBtn) maxBtn.onclick = () => sync(max);
 
-      // 増減ボタン
       document.querySelectorAll('.adj-btn[data-delta]').forEach(b => {
         b.onclick = () => sync(clamp((clamp(Number(input.value))) + Number(b.dataset.delta)));
       });
@@ -506,8 +326,7 @@ const App = {
         btn.disabled = true;
         g.nextTurn();
         if (g.phase === 'gameover') {
-          const user = Auth.currentUser();
-          if (user) DB.addScore(user.id, g.playerMoney, g.computerMoney, g.day, g.winner === 'player');
+          DB.addScore(g.playerMoney, g.computerMoney, g.day, g.winner === 'player');
         }
         this._renderGame();
       };
@@ -516,7 +335,7 @@ const App = {
       const btnAgain  = $('btn-again');
       const btnScores = $('btn-scores');
       if (btnAgain)  btnAgain.onclick  = () => { this.game = new GameState(); this._renderGame(); };
-      if (btnScores) btnScores.onclick = () => { location.hash = '#/highscores'; };
+      if (btnScores) btnScores.onclick = () => { location.hash = '#/scores'; };
     }
   },
 
@@ -583,26 +402,32 @@ const App = {
   },
 
   /* ═══════════════════════════════════
-     スコア一覧
+     成績画面
   ═══════════════════════════════════ */
-  _renderHighScores() {
+  _renderScores() {
+    const best3  = DB.getBest3();
     const scores = DB.getScores();
-    let rows = '';
+    const medals = ['🥇', '🥈', '🥉'];
 
+    const best3html = best3.length === 0
+      ? `<div style="color:var(--text-dim);text-align:center;padding:8px 0">まだ記録がありません</div>`
+      : best3.map((s, i) => `
+          <div class="prod-row">
+            <span class="prod-label">${medals[i]}&nbsp;${i + 1}位</span>
+            <span class="prod-value ${s.won ? 'player' : 'computer'}">${s.money.toLocaleString()}円</span>
+            <span style="font-size:.78rem;color:var(--text-dim);margin-left:auto">${s.won ? '勝' : '敗'}&nbsp;${s.days}日&nbsp;${s.date}</span>
+          </div>`).join('');
+
+    let rows = '';
     if (scores.length === 0) {
-      rows = `<tr><td colspan="7" class="score-none">まだスコアがありません</td></tr>`;
+      rows = `<tr><td colspan="5" class="score-none">まだ記録がありません</td></tr>`;
     } else {
-      scores.forEach((s, i) => {
-        const rc   = i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : '';
-        const comp = s.computerMoney != null ? s.computerMoney.toLocaleString() + '円' : '—';
-        const days = s.days != null ? s.days + '日' : '—';
+      scores.forEach(s => {
         rows += `
           <tr>
-            <td class="rank ${rc}">${i + 1}</td>
-            <td class="sc-player">${this._esc(s.userId)}</td>
             <td class="sc-num">${s.money.toLocaleString()}円</td>
-            <td class="sc-num sc-dim">${comp}</td>
-            <td class="sc-num sc-dim">${days}</td>
+            <td class="sc-num sc-dim">${s.computerMoney != null ? s.computerMoney.toLocaleString() + '円' : '—'}</td>
+            <td class="sc-num sc-dim">${s.days != null ? s.days + '日' : '—'}</td>
             <td class="${s.won ? 'score-win' : 'score-lose'}">${s.won ? '勝' : '敗'}</td>
             <td class="sc-date">${s.date}</td>
           </tr>`;
@@ -612,21 +437,23 @@ const App = {
     this._html(`
       <div class="screen">
         <div class="page-header">
-          <div class="page-title" style="font-size:1.5rem">SCORES</div>
-          <div class="page-subtitle">スコア一覧（${scores.length}件）</div>
+          <div class="page-title" style="font-size:1.5rem">成績</div>
         </div>
-        <div class="card ani" style="padding:12px 8px">
+        <div class="card ani" style="padding:12px 16px">
+          <div class="card-title">ベスト3（通算）</div>
+          ${best3html}
+        </div>
+        <div class="card ani" style="padding:12px 8px;margin-top:12px">
+          <div class="card-title">最近の記録（${scores.length}件）</div>
           <div class="score-scroll">
             <table class="score-table">
               <thead>
                 <tr>
-                  <th>#</th>
-                  <th>プレイヤー</th>
                   <th class="sc-num">あなた</th>
                   <th class="sc-num">相手</th>
                   <th class="sc-num">DAY</th>
                   <th>結果</th>
-                  <th class="sc-date">日付</th>
+                  <th class="sc-date">日時</th>
                 </tr>
               </thead>
               <tbody>${rows}</tbody>
@@ -634,7 +461,7 @@ const App = {
           </div>
         </div>
       </div>
-      ${this._nav('highscores')}
+      ${this._nav('scores')}
     `);
   },
 
